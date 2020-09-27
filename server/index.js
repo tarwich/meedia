@@ -1,8 +1,8 @@
 require('dotenv/config');
 const express = require('express');
-const { readdir } = require('fs').promises;
+const { readdir, stat } = require('fs').promises;
 const { resolve } = require('path');
-const videoStreamer = require('video-streamer');
+const videoStreamer = require('./video-streamer');
 const simpleThumbnail = require('simple-thumbnail');
 
 const { PORT = 8080, FILES = '.' } = process.env;
@@ -20,8 +20,14 @@ app.get(['/browse', '/browse/*'], async (request, response) => {
 
   console.log('Browse', { FILES, query });
   const files = await readdir(resolve(FILES, query));
+  const result = [];
 
-  response.send({ files });
+  for (const file of files) {
+    if (await (await stat(resolve(FILES, query, file))).isDirectory()) continue;
+    result.push(file);
+  }
+
+  response.send({ files: result });
 });
 
 app.get('/thumb/*', (request, response) => {
