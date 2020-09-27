@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "checkJs": true,
+    "allowJs": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "outDir": "dist",
+    "allowSyntheticDefaultImports": true,
+    "jsx": "react"
+  },
+  "exclude": ["node_modules"]
+}
