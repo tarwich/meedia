@@ -7,7 +7,8 @@
     "strictNullChecks": true,
     "outDir": "dist",
     "allowSyntheticDefaultImports": true,
-    "jsx": "react"
+    "jsx": "react",
+    "lib": ["ES2020", "DOM"]
   },
   "exclude": ["node_modules"]
 }

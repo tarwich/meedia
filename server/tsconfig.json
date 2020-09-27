@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "allowJs": true,
+    "outDir": "dist",
+    "checkJs": true,
+    "lib": ["ES2020"]
+  },
+  "exclude": ["node_modules"]
+}

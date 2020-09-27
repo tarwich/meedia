@@ -13,18 +13,29 @@ const app = express();
 
 console.log('Streaming files from', FILES_PATH);
 app.use('/image', express.static(FILES_PATH));
-app.get('/stream/:videoName', videoStreamer({ videoPath: FILES_PATH }));
+
+// const streamer = videoStreamer({ videoPath: FILES_PATH });
+
+// app.get('/stream/*', (request, response) => {
+//   return streamer(request, response);
+// });
+app.get('/stream/*', videoStreamer({ videoPath: FILES_PATH }));
 
 app.get(['/browse', '/browse/*'], async (request, response) => {
-  const query = request.params[0] || '';
+  const { 0: query = '' } = request.params;
 
-  console.log('Browse', { FILES, query });
-  const files = await readdir(resolve(FILES, query));
+  const path = query.replace(/^\//g, '');
+
+  console.log('Browse', { FILES, path });
+  const files = await readdir(resolve(FILES, path));
   const result = [];
 
   for (const file of files) {
-    if (await (await stat(resolve(FILES, query, file))).isDirectory()) continue;
-    result.push(file);
+    if ((await stat(resolve(FILES, path, file))).isDirectory()) {
+      result.push(`${file}/`);
+    } else {
+      result.push(file);
+    }
   }
 
   response.send({ files: result });
