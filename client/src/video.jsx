@@ -12,7 +12,7 @@ export const Video = ({ file = '' }) => {
       <Box>{file}</Box>
       <Button onClick={() => setStreaming(!isStreaming)}>Watch</Button>
       {isStreaming && (
-        <video autoPlay={true} controls={true} src={`/stream/${file}`}></video>
+        <video autoPlay={true} controls={true} src={`/stream/${file}`} loop={true}></video>
       )}
     </Box>
   );
