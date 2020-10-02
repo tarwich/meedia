@@ -44,10 +44,13 @@ app.get(['/browse', '/browse/*'], async (request, response) => {
 app.get('/thumb/*', (request, response) => {
   const { 0: path, width = '200' } = request.params;
 
-  simpleThumbnail(resolve(FILES_PATH, path), response, `${width}x?`);
+  simpleThumbnail(resolve(FILES_PATH, path), response, `${width}x?`, {seek: '00:00:01'});
 });
 
 app.use(express.static(resolve('../client/dist')));
+app.get('*', (request, response) => {
+  response.sendFile(resolve('../client/dist/index.html'));
+});
 
 app.listen(PORT, () => {
   console.log('Server is ready on port', PORT);

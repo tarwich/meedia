@@ -19,6 +19,7 @@
     "simple-thumbnail": "^1.6.5"
   },
   "devDependencies": {
-    "@types/node": "^14.11.2"
+    "@types/node": "^14.11.2",
+    "nodemon": "^2.0.4"
   }
 }

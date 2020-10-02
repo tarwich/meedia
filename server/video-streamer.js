@@ -35,8 +35,6 @@ async function processVideoStream(videoPath, req, res) {
 
   const extension = path.extname(videoName);
 
-  console.log(file);
-
   // if (extension !== '.mp4') {
   //   res.status(415).send({
   //     error: `File type ${extension} is not supported.`,
@@ -45,6 +43,16 @@ async function processVideoStream(videoPath, req, res) {
   // }
 
   const rangeHeader = req.headers.range;
+  const stats = await stat(file);
+
+  var positions = rangeHeader.replace(/bytes=/, '').split('-');
+  var start = parseInt(positions[0], 10);
+  var total = stats.size;
+  var end = positions[1] ? parseInt(positions[1], 10) : total - 1;
+  var chunksize = end - start + 1;
+
+  streamWithFluent(req, res, { file, start }).catch(console.error);
+
   // if (!rangeHeader) {
   //   res.status(400).send({
   //     error: 'Range header not found in video stream request.',
@@ -53,7 +61,6 @@ async function processVideoStream(videoPath, req, res) {
   // }
   // const positions = rangeHeader.replace(/bytes=/, '').split('-');
 
-  const stats = await stat(file);
   // const info = calculateFileInfo(stats.size, positions);
 
   // writeHeaders(res, info.start, info.end, info.total, info.chunksize);
@@ -90,15 +97,6 @@ async function processVideoStream(videoPath, req, res) {
   //   'Content-Length': chunksize,
   //   'Content-Type': 'video/mp4',
   // });
-
-  // ffmpeg(file)
-  //   .audioCodec('aac')
-  //   .videoCodec('libx264')
-  //   .format('mp4')
-  //   .on('end', () => console.log('File converted successfully'))
-  //   .on('error', (error) => console.error(error))
-  //   .stream()
-  //   .pipe(res, { end: true });
 
   // var stream = fs
   //   .createReadStream(file, { start: start, end: end, autoclose: true })
@@ -152,11 +150,47 @@ async function processVideoStream(videoPath, req, res) {
   //     console.log(err);
   //     res.status(500).send(err);
   //   });
+}
 
-  var range = req.headers.range;
+async function streamWithFluent(request, response, { file, start }) {
+  console.log('streamWithFluent', { file, start });
+
+  ffmpeg(file)
+    .outputOptions([
+      // ffmpeg -re -i YOURVIDEO.mp4 -c:v libx264 -b:v 2M -c:a copy -strict -2 -flags +global_header -bsf:a aac_adtstoasc -bufsize 2100k -f flv rtmp://a.rtmp.youtube.com/live2/YOUTUBESTREAMKEY
+      // '-movflags isml+frag_keyframe+faststart',
+      '-movflags frag_keyframe+empty_moov+default_base_moof+faststart',
+      '-c:v libx264',
+      '-crf 20',
+      '-pix_fmt yuv420p',
+      '-strict -2',
+      // '-vf "scale=trunc(iw/2)*2:trunc(ih/2)*2"',
+      '-vf scale=-2:ih',
+      // '-c:v libvpx',
+    ])
+    .toFormat('mp4')
+    // .toFormat('ismv')
+    // .toFormat('mpegts')
+    // .seekInput(start)
+    .on('end', () => console.log('File converted successfully'))
+    .on('error', (error) => console.error(error))
+    .pipe(response, { end: true });
+  // ffmpeg(file)
+  //   .audioCodec('aac')
+  //   .videoCodec('libx264')
+  //   .format('mp4')
+  //   .on('end', () => console.log('File converted successfully'))
+  //   .on('error', (error) => console.error(error))
+  //   .stream()
+  //   .pipe(response, { end: true });
+}
+
+async function streamDirectFromFile(request, response, { file }) {
+  const range = request.headers.range;
+  const stats = await stat(file);
 
   if (!range) {
-    return res.sendStatus(416);
+    return response.sendStatus(416);
   }
 
   var positions = range.replace(/bytes=/, '').split('-');
@@ -165,13 +199,13 @@ async function processVideoStream(videoPath, req, res) {
   var end = positions[1] ? parseInt(positions[1], 10) : total - 1;
   var chunksize = end - start + 1;
 
-  res.writeHead(206, {
+  response.writeHead(206, {
     'Transfer-Encoding': 'chunked',
 
     'Content-Range': 'bytes ' + start + '-' + end + '/' + total,
     'Accept-Ranges': 'bytes',
     'Content-Length': chunksize,
-    'Content-Type': mime.getType(req.params.filename),
+    'Content-Type': mime.getType(request.params.filename),
   });
 
   fs.createReadStream(file, { start: start, end: end, autoClose: true })
@@ -179,9 +213,9 @@ async function processVideoStream(videoPath, req, res) {
       console.log('Stream Done');
     })
     .on('error', function (err) {
-      res.end(err);
+      response.end(err);
     })
-    .pipe(res, { end: true });
+    .pipe(response, { end: true });
 }
 
 function calculateFileInfo(size, positions) {

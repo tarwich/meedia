@@ -6,14 +6,20 @@ export const Video = ({ file = '' }) => {
 
   return (
     <Box>
-      <Box>
-        <img src={`/thumb/${file}`} width="100%" />
-      </Box>
+      {isStreaming ? (
+        <video
+          autoPlay={true}
+          controls={true}
+          src={`/stream/${escape(file)}`}
+          loop={true}
+        ></video>
+      ) : (
+        <Box>
+          <img src={`/thumb/${escape(file)}`} width="100%" />
+        </Box>
+      )}
       <Box>{file}</Box>
       <Button onClick={() => setStreaming(!isStreaming)}>Watch</Button>
-      {isStreaming && (
-        <video autoPlay={true} controls={true} src={`/stream/${file}`} loop={true}></video>
-      )}
     </Box>
   );
 };

@@ -15,7 +15,7 @@ export const Application = ({ api }) => {
       <div>
         <h1>Meedia</h1>
         <Router>
-          <Route>
+          <Route path="*">
             <GallaryPage api={api} />
           </Route>
         </Router>
