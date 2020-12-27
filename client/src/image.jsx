@@ -1,10 +1,7 @@
-import { Box } from '@chakra-ui/core';
-import React from 'react';
-
-export const Image = ({ file = '' }) => {
+export const Image = ({ file = "" }) => {
   return (
-    <Box>
+    <div>
       <img src={`/image/${file}`} />
-    </Box>
+    </div>
   );
 };

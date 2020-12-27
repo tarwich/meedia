@@ -7,8 +7,10 @@
     "strictNullChecks": true,
     "outDir": "dist",
     "allowSyntheticDefaultImports": true,
-    "jsx": "react",
-    "lib": ["ES2020", "DOM"]
+    "jsx": "react-jsx",
+    "jsxImportSource": "@emotion/react",
+    "lib": ["ES2020", "DOM"],
+    "target": "ESNext"
   },
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "dist"]
 }
