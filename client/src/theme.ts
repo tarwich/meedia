@@ -1,9 +1,9 @@
-import { Theme } from "@emotion/react";
+import { Theme } from '@emotion/react';
 
 const SPACING = 8;
 
 export const THEME = {
-  spacing: (multiplier = 1) => {
+  spacing(multiplier = 1) {
     return SPACING * multiplier;
   },
 

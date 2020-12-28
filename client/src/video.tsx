@@ -1,82 +1,173 @@
+import { useTheme } from '@emotion/react';
 import { startCase } from 'lodash';
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
+import { IoFilm, IoHourglass, IoPlay, IoReload } from 'react-icons/io5';
 import { Api } from './api';
+import { If } from './if';
+import { DefaultTheme } from './theme';
 
 export type VideoProps = {
   file: {
     name: string;
     type: string;
+    ext: string;
     fullPath: string;
   };
   api: Api;
+};
+
+const WHITELIST = ['image/', 'video/mp4', 'video/webm'];
+
+const isWhitelisted = (type: string) => {
+  return !!WHITELIST.find((allow) => type.startsWith(allow));
 };
 
 export const Video = ({ file, api }: VideoProps) => {
   const [isStreaming, setStreaming] = useState(false);
   const [isConverting, setConverting] = useState(false);
   const [isConverted, setConverted] = useState(false);
+  const theme = useTheme() as DefaultTheme;
 
-  if (file.type.startsWith('image/')) {
-    return (
-      <div>
-        <img css={{ width: '100%' }} src={`image/${file.fullPath}`} />
-      </div>
-    );
-  }
-
-  if (
-    file.type.startsWith('video/') &&
-    file.type !== 'video/mp4' &&
-    file.type !== 'video/webm'
-  ) {
-    return (
-      <div>
-        <div>
-          <img src={`/thumb/${escape(file.fullPath)}`} width="100%" />
-        </div>
-        <div>{startCase(file.name)}</div>
-        <button
-          onClick={() => {
-            if (isConverted) {
-              location.reload();
-              return;
-            }
-
-            setConverting(true);
-            api.get('/convert', { file: file.fullPath }).then(() => {
-              setConverting(false);
-              setConverted(true);
-            });
-          }}
-          disabled={isConverting}
-        >
-          {isConverting ? 'Converting...' : isConverted ? 'Reload' : 'Convert'}
-        </button>
-      </div>
-    );
-  }
+  console.log({
+    borderRadius: `${theme.borderRadius}px`,
+  });
 
   return (
-    <div>
+    <div
+      css={{
+        display: 'grid',
+        gridTemplate: `
+          ' video' 200px
+          ' name ' auto
+          / 100%
+        `,
+        border: '1px solid hsl(220, 5%, 60%)',
+        borderRadius: theme.borderRadius,
+        alignItems: 'center',
+        justifyItems: 'center',
+        overflow: 'hidden',
+        boxShadow: '2px 2px 4px 0px hsla(220, 5%, 10%, 0.2)',
+      }}
+    >
       {isStreaming ? (
-        <video
-          autoPlay={true}
-          controls={true}
-          src={`/mp4/${escape(file.fullPath)}`}
-          loop={true}
-          css={{
-            width: '100%',
-          }}
-        ></video>
+        file.type.startsWith('image/') ? (
+          <img
+            src={`image/${file.fullPath}`}
+            css={{
+              width: '100%',
+            }}
+          />
+        ) : (
+          <video
+            autoPlay={true}
+            controls={true}
+            src={`/mp4/${escape(file.fullPath)}`}
+            loop={true}
+            css={{
+              width: '100%',
+            }}
+          ></video>
+        )
       ) : (
-        <div>
-          <img src={`/thumb/${escape(file.fullPath)}`} width="100%" />
-        </div>
+        <Fragment>
+          <img
+            src={`/thumb/${escape(file.fullPath)}`}
+            css={{
+              width: '100%',
+              gridArea: 'video',
+            }}
+          />
+
+          <div
+            css={{
+              gridArea: 'video',
+              display: 'grid',
+              alignItems: 'center',
+              justifyItems: 'center',
+              border: '1px solid hsl(220, 50%, 30%)',
+              background: 'hsla(220, 50%, 80%, 0.5)',
+              borderRadius: '50%',
+              padding: theme.spacing(),
+              cursor: 'pointer',
+            }}
+            onClick={() => {
+              if (isWhitelisted(file.type)) {
+                setStreaming(true);
+              } else {
+                if (isConverted) {
+                  location.reload();
+                } else {
+                  setConverting(true);
+                  api.get('/convert', { file: file.fullPath }).then(() => {
+                    setConverted(true);
+                    setConverting(false);
+                  });
+                }
+              }
+            }}
+          >
+            {isWhitelisted(file.type) ? (
+              <IoPlay
+                css={{
+                  gridArea: 'main',
+                  width: theme.spacing(10),
+                  height: theme.spacing(10),
+                  color: 'hsl(220, 50%, 30%)',
+                  transform: `translateX(${theme.spacing() - 1}px)`,
+                }}
+              />
+            ) : isConverting ? (
+              <IoHourglass
+                css={{
+                  gridArea: 'main',
+                  width: theme.spacing(10),
+                  height: theme.spacing(10),
+                  color: 'hsl(0, 50%, 30%)',
+                }}
+              />
+            ) : isConverted ? (
+              <IoReload
+                css={{
+                  gridArea: 'main',
+                  width: theme.spacing(10),
+                  height: theme.spacing(10),
+                  color: 'hsl(180, 50%, 30%)',
+                }}
+              />
+            ) : (
+              <IoFilm
+                css={{
+                  gridArea: 'main',
+                  width: theme.spacing(10),
+                  height: theme.spacing(10),
+                  color: 'hsl(0, 50%, 30%)',
+                }}
+              />
+            )}
+          </div>
+        </Fragment>
       )}
-      <div>{startCase(file.name)}</div>
-      <button onClick={() => setStreaming(!isStreaming)}>
-        {isStreaming ? 'Close' : 'Watch'}
-      </button>
+      <div
+        css={{
+          gridArea: 'name',
+          padding: theme.padding,
+        }}
+      >
+        {startCase(file.name)}
+      </div>
+      <span
+        css={{
+          gridArea: 'name',
+          alignSelf: 'end',
+          justifySelf: 'end',
+          background: 'hsl(220, 5%, 60%)',
+          color: 'white',
+          borderTopLeftRadius: theme.borderRadius,
+          padding: `0 ${theme.padding}px`,
+        }}
+      >
+        {file.ext}
+      </span>
     </div>
   );
 };

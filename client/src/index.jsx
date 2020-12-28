@@ -5,6 +5,7 @@ import { render } from 'react-dom';
 import { Api } from './api';
 import { Application } from './app';
 import { THEME } from './theme';
+import './index.css'
 
 const root =
   document.querySelector('#meedia') ||

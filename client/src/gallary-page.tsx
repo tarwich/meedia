@@ -25,6 +25,10 @@ type GallaryPageProps = {
 
 const ALLOWED_FILES = ['video', 'image', 'application/x-directory'];
 
+const PLAYABLE_FILES = new Set(['mp4', 'webm']);
+
+const isPlayable = (file: LocalFile) => PLAYABLE_FILES.has(file.ext);
+
 export const GallaryPage = observer(({ api }: GallaryPageProps) => {
   const match = useRouteMatch();
   // @ts-ignore
@@ -34,18 +38,17 @@ export const GallaryPage = observer(({ api }: GallaryPageProps) => {
   const store = useLocalStore(() => ({
     listing: [] as LocalFile[],
 
-    get mp4Files() {
+    get playableFiles() {
       return new Map(
-        store.listing
-          .filter((file) => file.ext.toLowerCase() === 'mp4')
-          .map((file) => [file.name, file])
+        store.listing.filter(isPlayable).map((file) => [file.name, file])
       );
     },
 
     get files() {
       return store.listing.filter((file) => {
         if (file.type === 'application/x-directory') return false;
-        if (file.ext !== 'mp4' && store.mp4Files.get(file.name)) return false;
+        if (!isPlayable(file) && store.playableFiles.get(file.name))
+          return false;
         return true;
       });
     },

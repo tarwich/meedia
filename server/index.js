@@ -80,19 +80,24 @@ app.get(['/browse', '/browse/*', '/list'], async (request, response) => {
 
 app.get('/thumb/*', (request, response) => {
   const { 0: path, width = '200' } = request.params;
+  const fullPath = resolve(FILES, path);
+  const mimeType = mime.getType(fullPath);
 
-  simpleThumbnail(resolve(FILES_PATH, path), response, `${width}x?`, {
-    seek: '00:00:01',
-  });
+  if (mimeType?.startsWith('video/')) {
+    simpleThumbnail(fullPath, response, `${width}x?`, {
+      seek: '00:00:01',
+    });
+  }
+  if (mimeType?.startsWith('image/')) {
+    simpleThumbnail(fullPath, response, `${width}x?`);
+  }
 });
 
 app.get('/convert', async (request, response) => {
   const fullPath = resolve(FILES, String(request.query.file));
   const fileInfo = parse(fullPath);
-  // console.log(fileInfo);
 
   ffmpeg(fullPath)
-    // .toFormat('mp4')
     .output(resolve(fileInfo.dir, `${fileInfo.name}.mp4`))
     .on('end', () => {
       response.send({ success: true });
