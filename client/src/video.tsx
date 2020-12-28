@@ -28,10 +28,6 @@ export const Video = ({ file, api }: VideoProps) => {
   const [isConverted, setConverted] = useState(false);
   const theme = useTheme() as DefaultTheme;
 
-  console.log({
-    borderRadius: `${theme.borderRadius}px`,
-  });
-
   return (
     <div
       css={{
@@ -52,7 +48,7 @@ export const Video = ({ file, api }: VideoProps) => {
       {isStreaming ? (
         file.type.startsWith('image/') ? (
           <img
-            src={`image/${file.fullPath}`}
+            src={`/image/${file.fullPath}`}
             css={{
               width: '100%',
             }}
