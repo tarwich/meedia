@@ -45,11 +45,22 @@ export const Video = ({ file, api }: VideoProps) => {
         boxShadow: '2px 2px 4px 0px hsla(220, 5%, 10%, 0.2)',
       }}
     >
+      <div
+        css={{
+          gridArea: 'video',
+          width: '105%',
+          height: '105%',
+          background: `center / cover url('/thumb/${escape(file.fullPath)}')`,
+          filter: 'blur(5px)',
+          zIndex: -1,
+        }}
+      ></div>
       {isStreaming ? (
         file.type.startsWith('image/') ? (
           <img
             src={`/image/${file.fullPath}`}
             css={{
+              gridArea: 'video',
               width: '100%',
             }}
           />
@@ -60,6 +71,7 @@ export const Video = ({ file, api }: VideoProps) => {
             src={`/mp4/${escape(file.fullPath)}`}
             loop={true}
             css={{
+              gridArea: 'video',
               width: '100%',
             }}
           ></video>
@@ -143,14 +155,25 @@ export const Video = ({ file, api }: VideoProps) => {
           </div>
         </Fragment>
       )}
+
+      {/* Name */}
       <div
         css={{
           gridArea: 'name',
           padding: theme.padding,
+          boxSizing: 'content-box',
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          maxWidth: `calc(100% - ${theme.padding * 2}px)`,
+          background: 'white',
         }}
+        title={file.name}
       >
         {startCase(file.name)}
       </div>
+
+      {/* Extension */}
       <span
         css={{
           gridArea: 'name',
