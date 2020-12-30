@@ -1,5 +1,6 @@
 import { useTheme } from '@emotion/react';
 import { startCase } from 'lodash';
+import { useLocalObservable } from 'mobx-react-lite';
 import { Fragment, useState } from 'react';
 import { IoFilm, IoHourglass, IoPlay, IoReload } from 'react-icons/io5';
 import { Api } from './api';
@@ -51,110 +52,122 @@ export const Video = ({ file, api }: VideoProps) => {
           width: '105%',
           height: '105%',
           background: `center / cover url('/thumb/${escape(file.fullPath)}')`,
-          filter: 'blur(5px)',
-          zIndex: -1,
+          filter: 'blur(1)',
         }}
       ></div>
-      {isStreaming ? (
-        file.type.startsWith('image/') ? (
-          <img
-            src={`/image/${file.fullPath}`}
-            css={{
-              gridArea: 'video',
-              width: '100%',
-            }}
-          />
+      <div
+        css={{
+          gridArea: 'video',
+          filter: 'blur(0)',
+          display: 'grid',
+          gridTemplate: `'video' 1fr / 1fr`,
+          width: '100%',
+          height: '100%',
+          alignItems: 'center',
+          justifyItems: 'center',
+        }}
+      >
+        {isStreaming ? (
+          file.type.startsWith('image/') ? (
+            <img
+              src={`/image/${file.fullPath}`}
+              css={{
+                gridArea: 'video',
+                width: '100%',
+              }}
+            />
+          ) : (
+            <video
+              autoPlay={true}
+              controls={true}
+              src={`/mp4/${escape(file.fullPath)}`}
+              loop={true}
+              css={{
+                gridArea: 'video',
+                width: '100%',
+              }}
+            ></video>
+          )
         ) : (
-          <video
-            autoPlay={true}
-            controls={true}
-            src={`/mp4/${escape(file.fullPath)}`}
-            loop={true}
-            css={{
-              gridArea: 'video',
-              width: '100%',
-            }}
-          ></video>
-        )
-      ) : (
-        <Fragment>
-          <img
-            src={`/thumb/${escape(file.fullPath)}`}
-            css={{
-              width: '100%',
-              gridArea: 'video',
-            }}
-          />
+          <Fragment>
+            <img
+              src={`/thumb/${escape(file.fullPath)}`}
+              css={{
+                width: '100%',
+                gridArea: 'video',
+              }}
+            />
 
-          <div
-            css={{
-              gridArea: 'video',
-              display: 'grid',
-              alignItems: 'center',
-              justifyItems: 'center',
-              border: '1px solid hsl(220, 50%, 30%)',
-              background: 'hsla(220, 50%, 80%, 0.5)',
-              borderRadius: '50%',
-              padding: theme.spacing(),
-              cursor: 'pointer',
-            }}
-            onClick={() => {
-              if (isWhitelisted(file.type)) {
-                setStreaming(true);
-              } else {
-                if (isConverted) {
-                  location.reload();
+            <div
+              css={{
+                gridArea: 'video',
+                display: 'grid',
+                alignItems: 'center',
+                justifyItems: 'center',
+                border: '1px solid hsl(220, 50%, 30%)',
+                background: 'hsla(220, 50%, 80%, 0.5)',
+                borderRadius: '50%',
+                padding: theme.spacing(),
+                cursor: 'pointer',
+              }}
+              onClick={() => {
+                if (isWhitelisted(file.type)) {
+                  setStreaming(true);
                 } else {
-                  setConverting(true);
-                  api.get('/convert', { file: file.fullPath }).then(() => {
-                    setConverted(true);
-                    setConverting(false);
-                  });
+                  if (isConverted) {
+                    location.reload();
+                  } else {
+                    setConverting(true);
+                    api.get('/convert', { file: file.fullPath }).then(() => {
+                      setConverted(true);
+                      setConverting(false);
+                    });
+                  }
                 }
-              }
-            }}
-          >
-            {isWhitelisted(file.type) ? (
-              <IoPlay
-                css={{
-                  gridArea: 'main',
-                  width: theme.spacing(10),
-                  height: theme.spacing(10),
-                  color: 'hsl(220, 50%, 30%)',
-                  transform: `translateX(${theme.spacing() - 1}px)`,
-                }}
-              />
-            ) : isConverting ? (
-              <IoHourglass
-                css={{
-                  gridArea: 'main',
-                  width: theme.spacing(10),
-                  height: theme.spacing(10),
-                  color: 'hsl(0, 50%, 30%)',
-                }}
-              />
-            ) : isConverted ? (
-              <IoReload
-                css={{
-                  gridArea: 'main',
-                  width: theme.spacing(10),
-                  height: theme.spacing(10),
-                  color: 'hsl(180, 50%, 30%)',
-                }}
-              />
-            ) : (
-              <IoFilm
-                css={{
-                  gridArea: 'main',
-                  width: theme.spacing(10),
-                  height: theme.spacing(10),
-                  color: 'hsl(0, 50%, 30%)',
-                }}
-              />
-            )}
-          </div>
-        </Fragment>
-      )}
+              }}
+            >
+              {isWhitelisted(file.type) ? (
+                <IoPlay
+                  css={{
+                    gridArea: 'main',
+                    width: theme.spacing(10),
+                    height: theme.spacing(10),
+                    color: 'hsl(220, 50%, 30%)',
+                    transform: `translateX(${theme.spacing() - 1}px)`,
+                  }}
+                />
+              ) : isConverting ? (
+                <IoHourglass
+                  css={{
+                    gridArea: 'main',
+                    width: theme.spacing(10),
+                    height: theme.spacing(10),
+                    color: 'hsl(0, 50%, 30%)',
+                  }}
+                />
+              ) : isConverted ? (
+                <IoReload
+                  css={{
+                    gridArea: 'main',
+                    width: theme.spacing(10),
+                    height: theme.spacing(10),
+                    color: 'hsl(180, 50%, 30%)',
+                  }}
+                />
+              ) : (
+                <IoFilm
+                  css={{
+                    gridArea: 'main',
+                    width: theme.spacing(10),
+                    height: theme.spacing(10),
+                    color: 'hsl(0, 50%, 30%)',
+                  }}
+                />
+              )}
+            </div>
+          </Fragment>
+        )}
+      </div>
 
       {/* Name */}
       <div

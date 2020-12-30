@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "module": "commonjs",
+    "moduleResolution": "Node",
     "allowJs": true,
     "outDir": "dist",
     "checkJs": true,

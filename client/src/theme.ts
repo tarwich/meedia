@@ -16,7 +16,7 @@ export const THEME = {
   },
 
   get borderRadius() {
-    return THEME.spacing() / 2;
+    return THEME.spacing(1) / 2;
   },
 };
 

@@ -1,6 +1,6 @@
-import { useTheme } from "@emotion/react";
-import { CSSProperties, ReactNode } from "react";
-import { DefaultTheme } from "../theme";
+import { css, useTheme } from '@emotion/react';
+import { CSSProperties, ReactNode } from 'react';
+import { DefaultTheme } from '../theme';
 
 export type VBoxProps = {
   className?: string;
@@ -9,13 +9,13 @@ export type VBoxProps = {
 };
 
 const gridCss: CSSProperties = {
-  display: "grid",
-  gridAutoFlow: "row",
+  display: 'grid',
+  gridAutoFlow: 'row',
 };
 
 const flexCss: CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
+  display: 'flex',
+  flexDirection: 'column',
 };
 
 export const VBox = (props: VBoxProps) => {
@@ -24,11 +24,15 @@ export const VBox = (props: VBoxProps) => {
 
   return (
     <div
-      css={{
-        ...(grid ? gridCss : flexCss),
-        gap: theme.gap,
-      }}
       {...restProps}
+      css={[
+        {
+          ...(grid ? gridCss : flexCss),
+          gap: theme.gap,
+        },
+        // @ts-ignore
+        props.css,
+      ]}
     >
       {children}
     </div>

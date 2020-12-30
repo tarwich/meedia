@@ -1,8 +1,8 @@
-import { useTheme } from '@emotion/react';
+import { css, useTheme } from '@emotion/react';
 import { startCase } from 'lodash';
 import { observer, useLocalObservable } from 'mobx-react-lite';
 import { basename } from 'path';
-import React, { useEffect } from 'react';
+import React, { Fragment, useEffect } from 'react';
 import { IoArrowUp } from 'react-icons/io5';
 import { Link, useRouteMatch } from 'react-router-dom';
 import { Api } from './api';
@@ -76,39 +76,35 @@ export const GallaryPage = observer(({ api }: GallaryPageProps) => {
   }, [directory]);
 
   return (
-    <div>
-      <div>
-        <MenuItem icon={<IoArrowUp css={{ color: 'white' }} />}>
-          <HBox
-            css={{
-              gap: theme.spacing(),
-            }}
-          >
-            {directory
-              .split('/')
-              .filter(Boolean)
-              .reduce(
-                (list, part) =>
-                  list.concat(
-                    '',
-                    `${list.slice(-1)[0]}/${part}`.replace('//', '/')
-                  ),
-                ['/']
-              )
-              .map((url, i, list) =>
-                url === '' ? (
-                  <span key={i}>/</span>
-                ) : i === list.length - 1 ? (
-                  <span key={url}>{basename(url) || '(root)'}</span>
-                ) : (
-                  <Link key={url} to={url}>
-                    {basename(url) || '(root)'}
-                  </Link>
-                )
-              )}
-          </HBox>
-        </MenuItem>
-      </div>
+    <Fragment>
+      <HBox
+        css={{
+          gap: theme.spacing(),
+        }}
+      >
+        {directory
+          .split('/')
+          .filter(Boolean)
+          .reduce(
+            (list, part) =>
+              list.concat(
+                '',
+                `${list.slice(-1)[0]}/${part}`.replace('//', '/')
+              ),
+            ['/']
+          )
+          .map((url, i, list) =>
+            url === '' ? (
+              <span key={i}>/</span>
+            ) : i === list.length - 1 ? (
+              <span key={url}>{basename(url) || '(root)'}</span>
+            ) : (
+              <Link key={url} to={url}>
+                {basename(url) || '(root)'}
+              </Link>
+            )
+          )}
+      </HBox>
       <HBox
         grid
         css={{
@@ -121,7 +117,7 @@ export const GallaryPage = observer(({ api }: GallaryPageProps) => {
             key={directory.fullPath}
             to={`/${escape(directory.fullPath)}`}
             css={{
-              margin: theme.padding,
+              textDecoration: 'none'
             }}
           >
             <MenuItem>{startCase(directory.name)}</MenuItem>
@@ -139,6 +135,6 @@ export const GallaryPage = observer(({ api }: GallaryPageProps) => {
           return <Video file={file} key={file.fullPath} api={api} />;
         })}
       </HBox>
-    </div>
+    </Fragment>
   );
 });

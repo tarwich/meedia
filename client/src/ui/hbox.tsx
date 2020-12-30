@@ -1,6 +1,6 @@
-import { useTheme } from "@emotion/react";
-import { CSSProperties, ReactNode } from "react";
-import { DefaultTheme } from "../theme";
+import { css, CSSObject, useTheme } from '@emotion/react';
+import { CSSProperties, ReactNode } from 'react';
+import { DefaultTheme } from '../theme';
 
 export type HBoxProps = {
   className?: string;
@@ -9,13 +9,13 @@ export type HBoxProps = {
 };
 
 const gridCss: CSSProperties = {
-  display: "grid",
-  gridAutoFlow: "column",
+  display: 'grid',
+  gridAutoFlow: 'column',
 };
 
 const flexCss: CSSProperties = {
-  display: "flex",
-  flexDirection: "row",
+  display: 'flex',
+  flexDirection: 'row',
 };
 
 export const HBox = (props: HBoxProps) => {
@@ -24,12 +24,16 @@ export const HBox = (props: HBoxProps) => {
 
   return (
     <div
-      css={{
-        ...(grid ? gridCss : flexCss),
-        gap: theme.gap,
-        padding: theme.padding,
-      }}
       {...restProps}
+      css={[
+        {
+          ...(grid ? gridCss : flexCss),
+          gap: theme.gap,
+          padding: theme.padding,
+        },
+        // @ts-ignore
+        props.css,
+      ]}
     >
       {children}
     </div>

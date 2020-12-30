@@ -5,9 +5,10 @@ import { render } from 'react-dom';
 import { Api } from './api';
 import { Application } from './app';
 import { THEME } from './theme';
-import './index.css'
+import './index.css';
+import ReactModal from 'react-modal';
 
-const root =
+const root: HTMLElement =
   document.querySelector('#meedia') ||
   document.body.appendChild(document.createElement('div'));
 root.id = 'meedia';
@@ -15,6 +16,7 @@ root.id = 'meedia';
 configure({ enforceActions: 'never' });
 
 const api = new Api();
+ReactModal.setAppElement(root);
 
 render(
   <ThemeProvider theme={THEME}>
