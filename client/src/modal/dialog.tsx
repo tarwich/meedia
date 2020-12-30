@@ -29,6 +29,7 @@ export const Dialog = (props: DialogProps) => {
           alignSelf: 'start',
           justifySelf: 'end',
           transform: `translate(${theme.spacing(5)}px, -${theme.spacing(5)}px)`,
+          borderRadius: '50%',
         }}
       >
         <IoCloseCircle />

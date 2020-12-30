@@ -1,15 +1,15 @@
-import { ClassNames, Global, Interpolation } from '@emotion/react';
+import { Global, Interpolation, useTheme } from '@emotion/react';
 import { observer, useLocalObservable } from 'mobx-react-lite';
-import React, { CSSProperties } from 'react';
+import React from 'react';
 import { IoQrCode } from 'react-icons/io5';
-import ReactModal from 'react-modal';
 import { QRCode } from 'react-qr-svg';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import { Api } from './api';
 import { GallaryPage } from './gallary-page';
 import { Dialog } from './modal/dialog';
-import { Button } from './ui/button';
+import { DefaultTheme } from './theme';
 import { HBox } from './ui/hbox';
+import { IconButton } from './ui/icon-button';
 import { VBox } from './ui/vbox';
 
 export type ApplicationProps = {
@@ -29,8 +29,9 @@ const BASE_CSS: Interpolation<any> = {
 
 export const Application = observer(({ api }: ApplicationProps) => {
   const store = useLocalObservable(() => ({
-    showQrCode: true,
+    showQrCode: false,
   }));
+  const theme = useTheme() as DefaultTheme;
 
   return (
     <VBox css={{ gap: 0 }}>
@@ -53,9 +54,9 @@ export const Application = observer(({ api }: ApplicationProps) => {
         }}
       >
         <h1>Meedia</h1>
-        <Button onClick={() => (store.showQrCode = true)}>
+        <IconButton onClick={() => (store.showQrCode = true)}>
           <IoQrCode />
-        </Button>
+        </IconButton>
         <Dialog
           isOpen={!!store.showQrCode}
           onRequestClose={() => (store.showQrCode = false)}
@@ -64,10 +65,12 @@ export const Application = observer(({ api }: ApplicationProps) => {
             fgColor={'black !important'}
             bgColor={'white'}
             value={location.href}
+            width={'auto'}
+            height={'auto'}
             css={{
               gridArea: 'main',
-              maxWidth: '100%',
-              maxHeight: '100%',
+              maxWidth: '200px',
+              maxHeight: '200px',
             }}
           />
         </Dialog>
