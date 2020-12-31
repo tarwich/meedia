@@ -16,8 +16,10 @@
     "@emotion/styled": "^10.0.27",
     "css.gg": "^2.0.0",
     "emotion-theming": "^10.0.27",
+    "faker": "^5.1.0",
     "mime": "^2.4.7",
     "parcel-bundler": "^1.12.4",
+    "qrcode.react": "^1.0.1",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-modal": "^3.12.1",
@@ -27,9 +29,11 @@
     "last 2 chrome versions"
   ],
   "devDependencies": {
+    "@types/faker": "^5.1.5",
     "@types/lodash": "^4.14.166",
     "@types/mime": "^2.0.3",
     "@types/node": "^14.14.16",
+    "@types/qrcode.react": "^1.0.1",
     "@types/react": "^16.14.2",
     "@types/react-dom": "^16.9.10",
     "@types/react-modal": "^3.10.6",

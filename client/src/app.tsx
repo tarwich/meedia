@@ -1,10 +1,10 @@
 import { Global, Interpolation, useTheme } from '@emotion/react';
 import { observer, useLocalObservable } from 'mobx-react-lite';
-import React from 'react';
-import { IoQrCode } from 'react-icons/io5';
-import { QRCode } from 'react-qr-svg';
+import QRCode from 'qrcode.react';
+import { IoDocumentTextOutline, IoQrCode } from 'react-icons/io5';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import { Api } from './api';
+import { BossView } from './boss-view';
 import { GallaryPage } from './gallary-page';
 import { Dialog } from './modal/dialog';
 import { DefaultTheme } from './theme';
@@ -30,8 +30,17 @@ const BASE_CSS: Interpolation<any> = {
 export const Application = observer(({ api }: ApplicationProps) => {
   const store = useLocalObservable(() => ({
     showQrCode: false,
+    bossMode: !!localStorage.getItem('boss'),
+
+    setBossMode(value: boolean) {
+      store.bossMode = value;
+      if (value) localStorage.setItem('boss', 'yes');
+      else localStorage.removeItem('boss');
+    },
   }));
   const theme = useTheme() as DefaultTheme;
+
+  if (store.bossMode) return <BossView setBossMode={store.setBossMode} />;
 
   return (
     <VBox css={{ gap: 0 }}>
@@ -54,6 +63,13 @@ export const Application = observer(({ api }: ApplicationProps) => {
         }}
       >
         <h1>Meedia</h1>
+
+        {/* Boss Button */}
+        <IconButton onClick={() => store.setBossMode(true)}>
+          <IoDocumentTextOutline />
+        </IconButton>
+
+        {/* QR Code */}
         <IconButton onClick={() => (store.showQrCode = true)}>
           <IoQrCode />
         </IconButton>
@@ -62,16 +78,10 @@ export const Application = observer(({ api }: ApplicationProps) => {
           onRequestClose={() => (store.showQrCode = false)}
         >
           <QRCode
-            fgColor={'black !important'}
-            bgColor={'white'}
             value={location.href}
-            width={'auto'}
-            height={'auto'}
-            css={{
-              gridArea: 'main',
-              maxWidth: '200px',
-              maxHeight: '200px',
-            }}
+            includeMargin={true}
+            size={theme.spacing(35)}
+            css={{ gridArea: 'main', borderRadius: theme.spacing(3) }}
           />
         </Dialog>
       </HBox>

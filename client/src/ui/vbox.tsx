@@ -1,8 +1,8 @@
 import { css, useTheme } from '@emotion/react';
-import { CSSProperties, ReactNode } from 'react';
+import { CSSProperties, HTMLAttributes, ReactNode } from 'react';
 import { DefaultTheme } from '../theme';
 
-export type VBoxProps = {
+export type VBoxProps = HTMLAttributes<HTMLDivElement> & {
   className?: string;
   grid?: boolean;
   children?: ReactNode;
