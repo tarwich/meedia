@@ -43,7 +43,7 @@ export const Application = observer(({ api }: ApplicationProps) => {
   if (store.bossMode) return <BossView setBossMode={store.setBossMode} />;
 
   return (
-    <VBox css={{ gap: 0 }}>
+    <VBox css={{ gap: 0, overflow: 'auto' }}>
       <Global
         styles={{
           '*': { boxSizing: 'border-box' },
@@ -62,7 +62,7 @@ export const Application = observer(({ api }: ApplicationProps) => {
           gridTemplateColumns: '1fr auto',
         }}
       >
-        <h1>Meedia</h1>
+        <h2>Meedia</h2>
 
         {/* Boss Button */}
         <IconButton onClick={() => store.setBossMode(true)}>

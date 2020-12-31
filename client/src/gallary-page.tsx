@@ -9,6 +9,7 @@ import { Api } from './api';
 import { MenuItem } from './menu-item';
 import { DefaultTheme } from './theme';
 import { HBox } from './ui/hbox';
+import { VBox } from './ui/vbox';
 import { Video } from './video';
 
 const WIDTH = 300;
@@ -76,7 +77,7 @@ export const GallaryPage = observer(({ api }: GallaryPageProps) => {
   }, [directory]);
 
   return (
-    <Fragment>
+    <VBox css={{ overflow: 'auto' }}>
       <HBox
         css={{
           gap: theme.spacing(),
@@ -117,7 +118,7 @@ export const GallaryPage = observer(({ api }: GallaryPageProps) => {
             key={directory.fullPath}
             to={`/${escape(directory.fullPath)}`}
             css={{
-              textDecoration: 'none'
+              textDecoration: 'none',
             }}
           >
             <MenuItem>{startCase(directory.name)}</MenuItem>
@@ -135,6 +136,6 @@ export const GallaryPage = observer(({ api }: GallaryPageProps) => {
           return <Video file={file} key={file.fullPath} api={api} />;
         })}
       </HBox>
-    </Fragment>
+    </VBox>
   );
 });
