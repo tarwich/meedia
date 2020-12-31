@@ -106,36 +106,38 @@ export const GallaryPage = observer(({ api }: GallaryPageProps) => {
             )
           )}
       </HBox>
-      <HBox
-        grid
-        css={{
-          gridAutoFlow: 'row',
-          gridTemplateColumns: `repeat(auto-fill, minmax(200px, 300px))`,
-        }}
-      >
-        {store.directories.map((directory) => (
-          <Link
-            key={directory.fullPath}
-            to={`/${escape(directory.fullPath)}`}
-            css={{
-              textDecoration: 'none',
-            }}
-          >
-            <MenuItem>{startCase(directory.name)}</MenuItem>
-          </Link>
-        ))}
-      </HBox>
-      <HBox
-        grid
-        css={{
-          gridAutoFlow: 'row',
-          gridTemplateColumns: `repeat(auto-fill, minmax(200px, 300px))`,
-        }}
-      >
-        {store.files.map((file) => {
-          return <Video file={file} key={file.fullPath} api={api} />;
-        })}
-      </HBox>
+      <VBox css={{ padding: 0, overflow: 'auto' }}>
+        <HBox
+          grid
+          css={{
+            gridAutoFlow: 'row',
+            gridTemplateColumns: `repeat(auto-fill, minmax(calc(10% + 50px), auto))`,
+          }}
+        >
+          {store.directories.map((directory) => (
+            <Link
+              key={directory.fullPath}
+              to={`/${escape(directory.fullPath)}`}
+              css={{
+                textDecoration: 'none',
+              }}
+            >
+              <MenuItem>{startCase(directory.name)}</MenuItem>
+            </Link>
+          ))}
+        </HBox>
+        <HBox
+          grid
+          css={{
+            gridAutoFlow: 'row',
+            gridTemplateColumns: `repeat(auto-fit, minmax(200px, auto))`,
+          }}
+        >
+          {store.files.map((file) => {
+            return <Video file={file} key={file.fullPath} api={api} />;
+          })}
+        </HBox>
+      </VBox>
     </VBox>
   );
 });
