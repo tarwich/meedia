@@ -51,8 +51,10 @@ export const Video = ({ file, api }: VideoProps) => {
           gridArea: 'video',
           width: '105%',
           height: '105%',
+          filter: `blur(${theme.spacing(3)}px)`,
+        }}
+        style={{
           background: `center / cover url('/thumb/${escape(file.fullPath)}')`,
-          filter: 'blur(1)',
         }}
       ></div>
       <div
@@ -179,7 +181,9 @@ export const Video = ({ file, api }: VideoProps) => {
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           maxWidth: `calc(100% - ${theme.padding * 2}px)`,
-          background: 'white',
+          width: '100%',
+          background: 'black',
+          textAlign: 'center',
         }}
         title={file.name}
       >

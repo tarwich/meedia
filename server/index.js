@@ -111,14 +111,6 @@ app.get('/convert', async (request, response) => {
     .run();
 });
 
-// app.get('/address', async (request, response) => {
-//   response.send({
-//     ip: await InternalIp.v4(),
-//     port: PORT,
-//     address: new URL(`http://${ip}:${PORT}/`),
-//   });
-// });
-
 app.use(express.static(resolve('../client/dist')));
 app.get('*', (request, response) => {
   response.sendFile(resolve('../client/dist/index.html'));
