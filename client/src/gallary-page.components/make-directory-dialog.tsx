@@ -1,10 +1,11 @@
-import { useTheme } from "@emotion/react";
-import { observer, useLocalObservable } from "mobx-react-lite";
-import React from "react";
-import { Api } from "../api";
-import { Dialog } from "../modal/dialog";
-import { DefaultTheme } from "../ui/theme";
-import { VBox } from "../ui/vbox";
+import { useTheme } from '@emotion/react';
+import { observer, useLocalObservable } from 'mobx-react-lite';
+import React from 'react';
+import { useHistory } from 'react-router-dom';
+import { Api } from '../api';
+import { Dialog } from '../modal/dialog';
+import { DefaultTheme } from '../ui/theme';
+import { VBox } from '../ui/vbox';
 
 export const MakeDirectoryDialog = observer(
   ({
@@ -19,21 +20,18 @@ export const MakeDirectoryDialog = observer(
     api: Api;
   }) => {
     const theme = useTheme() as DefaultTheme;
+    const history = useHistory();
     const store = useLocalObservable(() => ({
       name: '',
       busy: false,
 
-      createDirectory: () => {
+      createDirectory: async () => {
         if (store.busy) return;
         store.busy = true;
 
-        api
-          .post('action/mkdir', { path: `${basePath}/${store.name}` })
-          .then(() => {
-            store.busy = false;
-            restProps.onRequestClose?.();
-          })
-          .catch((error) => console.error(error));
+        await api.post('action/mkdir', { path: `${basePath}/${store.name}` });
+        history.push(`${basePath}/${store.name}`)
+        restProps.onRequestClose?.();
       },
     }));
 
