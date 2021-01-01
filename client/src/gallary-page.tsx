@@ -1,24 +1,17 @@
-import { css, useTheme } from '@emotion/react';
+import { useTheme } from '@emotion/react';
 import { startCase } from 'lodash';
 import { observer, useLocalObservable } from 'mobx-react-lite';
 import { basename } from 'path';
-import React, {
-  cloneElement,
-  Fragment,
-  ReactElement,
-  ReactNode,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
-import { IoAddCircle, IoArrowUp } from 'react-icons/io5';
+import React, { ReactElement, useEffect, useState } from 'react';
+import { IoAddCircle, IoTrash } from 'react-icons/io5';
 import { Link, useRouteMatch } from 'react-router-dom';
 import { Api } from './api';
+import { DeleteDirectoryDialog } from './gallary-page.components/delete-directory-dialog';
+import { MakeDirectoryDialog } from './gallary-page.components/make-directory-dialog';
 import { MenuItem } from './menu-item';
-import { Dialog, DialogProps } from './modal/dialog';
-import { DefaultTheme } from './ui/theme';
 import { HBox } from './ui/hbox';
 import { IconButton } from './ui/icon-button';
+import { DefaultTheme } from './ui/theme';
 import { VBox } from './ui/vbox';
 import { Video } from './video';
 
@@ -134,6 +127,15 @@ export const GallaryPage = observer(({ api }: GallaryPageProps) => {
           <IconButton
             onClick={() => {
               store.showDialog(
+                <DeleteDirectoryDialog api={api} directory={directory} />
+              );
+            }}
+          >
+            <IoTrash />
+          </IconButton>
+          <IconButton
+            onClick={() => {
+              store.showDialog(
                 <MakeDirectoryDialog api={api} basePath={directory} />
               );
             }}
@@ -178,61 +180,3 @@ export const GallaryPage = observer(({ api }: GallaryPageProps) => {
     </VBox>
   );
 });
-
-const MakeDirectoryDialog = observer(
-  ({
-    api,
-    basePath,
-    ...restProps
-  }: {
-    className?: string;
-    children?: string;
-    onRequestClose?(): void;
-    basePath: string;
-    api: Api;
-  }) => {
-    const theme = useTheme() as DefaultTheme;
-    const store = useLocalObservable(() => ({
-      name: '',
-      busy: false,
-
-      createDirectory: () => {
-        if (store.busy) return;
-        store.busy = true;
-
-        api
-          .post('action/mkdir', { path: `${basePath}/${store.name}` })
-          .then(() => {
-            store.busy = false;
-            restProps.onRequestClose?.();
-          })
-          .catch((error) => console.error(error));
-      },
-    }));
-
-    return (
-      <Dialog
-        title={'Create Directory'}
-        actions={{
-          cancel: () => restProps.onRequestClose?.(),
-          createDirectory: store.createDirectory,
-        }}
-        {...restProps}
-      >
-        {store.busy ? (
-          'Busy...'
-        ) : (
-          <VBox css={{ padding: theme.padding }}>
-            <input
-              type="text"
-              placeholder="Name"
-              value={store.name}
-              autoFocus={true}
-              onChange={(event) => (store.name = event.target.value)}
-            />
-          </VBox>
-        )}
-      </Dialog>
-    );
-  }
-);

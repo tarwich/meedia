@@ -29,6 +29,7 @@ export const VBox = (props: VBoxProps) => {
         {
           ...(grid ? gridCss : flexCss),
           gap: theme.gap,
+          padding: theme.padding,
         },
         // @ts-ignore
         props.css,

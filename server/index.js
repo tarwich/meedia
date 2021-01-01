@@ -1,7 +1,7 @@
 // @ts-check
 require('dotenv/config');
 const express = require('express');
-const { readdir, mkdir, stat } = require('fs').promises;
+const { readdir, mkdir, stat, unlink, rmdir } = require('fs').promises;
 const { createReadStream } = require('fs');
 const InternalIp = require('internal-ip');
 const { URL } = require('url');
@@ -126,13 +126,29 @@ app.get('/convert', async (request, response) => {
 });
 
 app.post('/action/mkdir', (request, response) => {
-  const { path } = request.body;
-
-  const fullPath = sanitizePath(FILES_PATH, path);
+  const fullPath = sanitizePath(FILES_PATH, request.body.path || '/');
 
   mkdir(fullPath)
     .then(() => response.send({ success: true }))
     .catch((error) => response.status(500).send(error));
+});
+
+app.post('/action/unlink', (request, response) => {
+  const fullPath = sanitizePath(FILES_PATH, request.body.file || '/');
+
+  unlink(fullPath)
+    .then(() => response.send({ success: true }))
+    .catch((error) => response.status(500).send(error));
+});
+
+app.post('/action/rmdir', async (request, response) => {
+  try {
+    const fullPath = sanitizePath(FILES_PATH, request.body.path || '/');
+    await rmdir(fullPath);
+    response.send({ success: true });
+  } catch (error) {
+    response.status(500).send(error);
+  }
 });
 
 app.use(express.static(resolve('../client/dist')));

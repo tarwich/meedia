@@ -71,7 +71,7 @@ export const Dialog = (props: DialogProps) => {
           <HBox
             css={{
               gridArea: 'actions',
-              placeItems: 'center end',
+              placeContent: 'center end',
             }}
           >
             {Object.entries(actions).map(([name, callback]) => (
