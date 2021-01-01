@@ -1,24 +1,30 @@
 import { useTheme } from '@emotion/react';
+import { last, startCase } from 'lodash';
 import { IoCloseCircle } from 'react-icons/io5';
-import { DefaultTheme } from '../theme';
+import { DefaultTheme } from '../ui/theme';
+import { Button } from '../ui/button';
+import { HBox } from '../ui/hbox';
 import { IconButton } from '../ui/icon-button';
-import { VBox } from '../ui/vbox';
 import { Modal, ModalProps } from './modal';
 
-export type DialogProps = ModalProps & {};
+export type DialogProps = ModalProps & {
+  title?: string;
+  actions?: Record<string, () => void>;
+};
 
 export const Dialog = (props: DialogProps) => {
-  const { children, ...restProps } = props;
+  const { actions, children, title, ...restProps } = props;
   const theme = useTheme() as DefaultTheme;
+
+  const [, primaryCallback] = last(Object.entries(actions || {})) || [];
 
   return (
     <Modal
       css={{
-        padding: theme.gap,
         border: '1px solid hsl(220, 20%, 40%)',
         borderRadius: theme.borderRadius * 2,
         background: 'hsl(40, 10%, 98%)',
-        gridTemplate: `'main' 1fr/1fr`,
+        gridTemplate: `[main] 1fr / 1fr`,
       }}
       {...restProps}
     >
@@ -26,21 +32,56 @@ export const Dialog = (props: DialogProps) => {
         onClick={props.onRequestClose}
         css={{
           gridArea: 'main',
-          alignSelf: 'start',
-          justifySelf: 'end',
-          transform: `translate(${theme.spacing(5)}px, -${theme.spacing(5)}px)`,
+          placeSelf: 'start end',
+          transform: `translate(${theme.spacing(2)}px, -${theme.spacing(2)}px)`,
           borderRadius: '50%',
         }}
       >
         <IoCloseCircle />
       </IconButton>
-      <VBox
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          primaryCallback?.();
+        }}
         css={{
           gridArea: 'main',
+          display: 'grid',
+          gridTemplate: `
+            ' header  ' auto
+            ' main    ' 1fr
+            ' actions ' auto
+            / 1fr
+          `,
         }}
       >
-        {children}
-      </VBox>
+        {title && (
+          <HBox
+            css={{
+              placeSelf: 'normal',
+              background: 'hsl(220, 30%, 90%)',
+              borderBottom: '1px solid hsl(220, 20%, 80%)',
+            }}
+          >
+            {title}
+          </HBox>
+        )}
+        <div>{children}</div>
+        {actions && (
+          <HBox
+            css={{
+              gridArea: 'actions',
+              placeItems: 'center end',
+            }}
+          >
+            {Object.entries(actions).map(([name, callback]) => (
+              <Button key={name} onClick={callback}>
+                {startCase(name)}
+              </Button>
+            ))}
+          </HBox>
+        )}
+      </form>
     </Modal>
   );
 };

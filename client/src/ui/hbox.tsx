@@ -1,6 +1,6 @@
 import { css, CSSObject, useTheme } from '@emotion/react';
 import { CSSProperties, ReactNode } from 'react';
-import { DefaultTheme } from '../theme';
+import { DefaultTheme } from './theme';
 
 export type HBoxProps = {
   className?: string;

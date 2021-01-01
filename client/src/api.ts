@@ -31,6 +31,8 @@ export class Api {
       { method: 'GET' }
     );
 
+    if (!response.ok) throw new Error(await response.text());
+
     return (await response.json()) as TResponse;
   }
 
@@ -42,6 +44,8 @@ export class Api {
       { method: 'DELETE' }
     );
 
+    if (!response.ok) throw new Error(await response.text());
+
     return (await response.json()) as TResponse;
   }
 
@@ -51,7 +55,12 @@ export class Api {
     const response = await fetch(url.toString(), {
       method: 'PATCH',
       body: JSON.stringify(body),
+      headers: {
+        'Content-Type': 'application/json',
+      },
     });
+
+    if (!response.ok) throw new Error(await response.text());
 
     return (await response.json()) as TResponse;
   }
@@ -60,9 +69,14 @@ export class Api {
     const url = applyFieldsToUrl(`${this.server}/${slug}`, body);
 
     const response = await fetch(url.toString(), {
-      method: 'GET',
+      method: 'POST',
       body: JSON.stringify(body),
+      headers: {
+        'Content-Type': 'application/json',
+      },
     });
+
+    if (!response.ok) throw new Error(await response.text());
 
     return (await response.json()) as TResponse;
   }

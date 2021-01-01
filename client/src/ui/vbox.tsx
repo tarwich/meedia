@@ -1,6 +1,6 @@
 import { css, useTheme } from '@emotion/react';
 import { CSSProperties, HTMLAttributes, ReactNode } from 'react';
-import { DefaultTheme } from '../theme';
+import { DefaultTheme } from './theme';
 
 export type VBoxProps = HTMLAttributes<HTMLDivElement> & {
   className?: string;

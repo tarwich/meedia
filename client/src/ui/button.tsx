@@ -1,6 +1,6 @@
 import { useTheme } from '@emotion/react';
 import { HTMLAttributes, ReactNode } from 'react';
-import { DefaultTheme } from '../theme';
+import { DefaultTheme } from './theme';
 import { HBox } from './hbox';
 
 export type ButtonProps = {

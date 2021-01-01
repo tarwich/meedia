@@ -1,7 +1,7 @@
 // @ts-check
 require('dotenv/config');
 const express = require('express');
-const { readdir, stat } = require('fs').promises;
+const { readdir, mkdir, stat } = require('fs').promises;
 const { createReadStream } = require('fs');
 const InternalIp = require('internal-ip');
 const { URL } = require('url');
@@ -10,11 +10,25 @@ const simpleThumbnail = require('simple-thumbnail');
 const mime = require('mime');
 const ffmpeg = require('fluent-ffmpeg');
 
-const { PORT = 8080, FILES = '.' } = process.env;
+const { PORT = 8080 } = process.env;
 
-const FILES_PATH = resolve(FILES);
+const FILES_PATH = resolve(process.env.FILES || '.');
+
+const RE_RELATIVE = /^[\.\/\\]+/;
+
+/**
+ * @param {string} base
+ * @param {string} path
+ */
+const sanitizePath = (base, path) => {
+  const result = resolve(base, path.replace(RE_RELATIVE, ''));
+  if (result.startsWith(base)) return result;
+  return null;
+};
 
 const app = express();
+
+app.use(express.json());
 
 console.log('Streaming files from', FILES_PATH);
 app.use((request, response, next) => {
@@ -26,7 +40,7 @@ app.use('/image', express.static(FILES_PATH));
 app.get('/mp4/*', async (request, response) => {
   const { 0: filePath = '' } = request.params;
 
-  const fullPath = resolve(FILES, filePath);
+  const fullPath = resolve(FILES_PATH, filePath);
   const stats = await stat(fullPath);
   const fileSize = stats.size;
   const range = request.headers.range;
@@ -59,10 +73,10 @@ app.get(['/browse', '/browse/*', '/list'], async (request, response) => {
 
   const path = String(request.query.path) || query.replace(/^\//g, '');
 
-  console.log('Browse', { FILES, path });
-  const files = await readdir(resolve(FILES, path));
+  console.log('Browse', { FILES: FILES_PATH, path });
+  const files = await readdir(resolve(FILES_PATH, path));
   const result = files.map(async (base) => {
-    const fullPath = resolve(FILES, path, base);
+    const fullPath = resolve(FILES_PATH, path, base);
     const { name, ext } = parse(fullPath);
     const stats = await stat(fullPath);
     const isDirectory = stats.isDirectory();
@@ -71,7 +85,7 @@ app.get(['/browse', '/browse/*', '/list'], async (request, response) => {
       name,
       base,
       ext: ext.slice(1),
-      fullPath: relative(FILES, fullPath),
+      fullPath: relative(FILES_PATH, fullPath),
       type: isDirectory ? 'application/x-directory' : mime.getType(fullPath),
       isDirectory,
     };
@@ -82,7 +96,7 @@ app.get(['/browse', '/browse/*', '/list'], async (request, response) => {
 
 app.get('/thumb/*', (request, response) => {
   const { 0: path, width = '200' } = request.params;
-  const fullPath = resolve(FILES, path);
+  const fullPath = resolve(FILES_PATH, path);
   const mimeType = mime.getType(fullPath);
 
   if (mimeType?.startsWith('video/')) {
@@ -96,7 +110,7 @@ app.get('/thumb/*', (request, response) => {
 });
 
 app.get('/convert', async (request, response) => {
-  const fullPath = resolve(FILES, String(request.query.file));
+  const fullPath = resolve(FILES_PATH, String(request.query.file));
   const fileInfo = parse(fullPath);
 
   ffmpeg(fullPath)
@@ -109,6 +123,16 @@ app.get('/convert', async (request, response) => {
       response.send({ success: false });
     })
     .run();
+});
+
+app.post('/action/mkdir', (request, response) => {
+  const { path } = request.body;
+
+  const fullPath = sanitizePath(FILES_PATH, path);
+
+  mkdir(fullPath)
+    .then(() => response.send({ success: true }))
+    .catch((error) => response.status(500).send(error));
 });
 
 app.use(express.static(resolve('../client/dist')));

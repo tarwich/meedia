@@ -4,8 +4,7 @@ import React from 'react';
 import { render } from 'react-dom';
 import { Api } from './api';
 import { Application } from './app';
-import { THEME } from './theme';
-import './index.css';
+import { THEME } from './ui/theme';
 import ReactModal from 'react-modal';
 
 const root: HTMLElement =

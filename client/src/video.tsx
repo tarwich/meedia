@@ -5,7 +5,7 @@ import { Fragment, useState } from 'react';
 import { IoFilm, IoHourglass, IoPlay, IoReload } from 'react-icons/io5';
 import { Api } from './api';
 import { If } from './if';
-import { DefaultTheme } from './theme';
+import { DefaultTheme } from './ui/theme';
 
 export type VideoProps = {
   file: {

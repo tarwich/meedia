@@ -7,7 +7,7 @@ import { Api } from './api';
 import { BossView } from './boss-view';
 import { GallaryPage } from './gallary-page';
 import { Dialog } from './modal/dialog';
-import { DefaultTheme } from './theme';
+import { DefaultTheme } from './ui/theme';
 import { HBox } from './ui/hbox';
 import { IconButton } from './ui/icon-button';
 import { VBox } from './ui/vbox';

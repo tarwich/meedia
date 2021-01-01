@@ -1,7 +1,7 @@
 import { css, CSSObject, useTheme } from '@emotion/react';
 import { ReactNode } from 'react';
 import { IoFolder } from 'react-icons/io5';
-import { DefaultTheme } from './theme';
+import { DefaultTheme } from './ui/theme';
 import { HBox } from './ui/hbox';
 
 type MenuItemProps = {

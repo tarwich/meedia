@@ -1,12 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Meedia</title>
-</head>
-<body>
-  <div id="meedia">Loading...</div>
-  <script src="src/index.tsx"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Meedia</title>
+  </head>
+  <body>
+    <div id="meedia">Loading...</div>
+    <script>
+      window.setTimeout(() => {
+        const root = document.querySelector('#meedia');
+
+        if (root.childNodes?.[0]?.textContent === 'Loading...') {
+          location.reload();
+        }
+      }, 1000);
+    </script>
+    <script src="src/index.tsx"></script>
+  </body>
 </html>

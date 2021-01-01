@@ -1,5 +1,5 @@
 import { useTheme } from '@emotion/react';
-import { DefaultTheme } from '../theme';
+import { DefaultTheme } from './theme';
 import { Button, ButtonProps } from './button';
 
 export type IconButtonProps = ButtonProps;
