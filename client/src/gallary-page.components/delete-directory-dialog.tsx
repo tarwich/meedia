@@ -122,6 +122,8 @@ export const DeleteDirectoryDialog = observer(
                   css={{
                     gridTemplateColumns:
                       'repeat(auto-fill, minmax(200px, auto))',
+                    flexWrap: 'wrap',
+                    wordBreak: 'break-all',
                   }}
                 >
                   {store.files.map((file) => (

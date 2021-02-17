@@ -17,7 +17,7 @@ export type VideoProps = {
   api: Api;
 };
 
-const WHITELIST = ['image/', 'video/mp4', 'video/webm'];
+const WHITELIST = ['image/', 'video/mp4', 'video/webm', 'audio/'];
 
 const isWhitelisted = (type: string) => {
   return !!WHITELIST.find((allow) => type.startsWith(allow));
@@ -63,8 +63,9 @@ export const Video = ({ file, api }: VideoProps) => {
           filter: 'blur(0)',
           display: 'grid',
           gridTemplate: `'video' 1fr / 1fr`,
-          width: '100%',
-          height: '100%',
+          maxWidth: '100%',
+          maxHeight: '100%',
+          placeSelf: 'normal',
           alignItems: 'center',
           justifyItems: 'center',
         }}
@@ -75,7 +76,8 @@ export const Video = ({ file, api }: VideoProps) => {
               src={`/image/${file.fullPath}`}
               css={{
                 gridArea: 'video',
-                width: '100%',
+                maxWidth: '100%',
+                maxHeight: '100%',
               }}
             />
           ) : (
@@ -86,7 +88,8 @@ export const Video = ({ file, api }: VideoProps) => {
               loop={true}
               css={{
                 gridArea: 'video',
-                width: '100%',
+                maxWidth: '100%',
+                maxHeight: '100%',
               }}
             ></video>
           )
@@ -95,7 +98,8 @@ export const Video = ({ file, api }: VideoProps) => {
             <img
               src={`/thumb/${escape(file.fullPath)}`}
               css={{
-                width: '100%',
+                maxWidth: '100%',
+                maxHeight: '100%',
                 gridArea: 'video',
               }}
             />

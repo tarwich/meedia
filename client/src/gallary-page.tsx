@@ -1,9 +1,14 @@
 import { useTheme } from '@emotion/react';
 import { startCase } from 'lodash';
-import { observer, useLocalObservable } from 'mobx-react-lite';
+import { observer, useLocalObservable, useLocalStore } from 'mobx-react-lite';
 import { basename } from 'path';
 import React, { ReactElement, useEffect, useState } from 'react';
-import { IoAddCircle, IoTrash } from 'react-icons/io5';
+import {
+  IoAddCircle,
+  IoFolderOpen,
+  IoPlayForwardCircle,
+  IoTrash,
+} from 'react-icons/io5';
 import { Link, useRouteMatch } from 'react-router-dom';
 import { Api } from './api';
 import { DeleteDirectoryDialog } from './gallary-page.components/delete-directory-dialog';
@@ -27,7 +32,7 @@ type GallaryPageProps = {
   api: Api;
 };
 
-const ALLOWED_FILES = ['video', 'image', 'application/x-directory'];
+const ALLOWED_FILES = ['video', 'image', 'application/x-directory', 'audio'];
 
 const PLAYABLE_FILES = new Set(['mp4', 'webm']);
 
@@ -45,6 +50,7 @@ export const GallaryPage = observer(({ api }: GallaryPageProps) => {
 
   const store = useLocalObservable(() => ({
     listing: [] as LocalFile[],
+    autoplay: false,
 
     get playableFiles() {
       return new Map(
@@ -93,7 +99,7 @@ export const GallaryPage = observer(({ api }: GallaryPageProps) => {
 
   return (
     <VBox css={{ overflow: 'auto' }}>
-      <HBox css={{ gridTemplateColumns: 'auto 1fr' }}>
+      <HBox css={{ flexWrap: 'wrap' }}>
         <HBox
           css={{
             gap: theme.spacing(),
@@ -124,6 +130,15 @@ export const GallaryPage = observer(({ api }: GallaryPageProps) => {
             )}
         </HBox>
         <HBox css={{ flex: '1 0 auto', placeContent: 'center end' }}>
+          {/* <IconButton
+            onClick={() => {
+              // store.showDialog(
+              //   <DeleteDirectoryDialog api={api} directory={directory} />
+              // );
+            }}
+          >
+            <IoAddCircle />
+          </IconButton> */}
           <IconButton
             onClick={() => {
               store.showDialog(
@@ -140,7 +155,14 @@ export const GallaryPage = observer(({ api }: GallaryPageProps) => {
               );
             }}
           >
-            <IoAddCircle />
+            <IoFolderOpen />
+          </IconButton>
+          <IconButton
+            onClick={() => {
+              store.autoplay = !store.autoplay;
+            }}
+          >
+            <IoPlayForwardCircle />
           </IconButton>
         </HBox>
       </HBox>
@@ -164,6 +186,9 @@ export const GallaryPage = observer(({ api }: GallaryPageProps) => {
             </Link>
           ))}
         </HBox>
+        {store.autoplay && (
+          <Autoplay files={[...store.playableFiles.values()]} />
+        )}
         <HBox
           grid
           css={{
@@ -180,3 +205,25 @@ export const GallaryPage = observer(({ api }: GallaryPageProps) => {
     </VBox>
   );
 });
+
+export const Autoplay = ({ files = [] as LocalFile[] }) => {
+  const [videoIndex, setVideoIndex] = useState(0);
+
+  const file = files[videoIndex];
+
+  if (!file) return <div>No more files</div>;
+
+  return (
+    <div css={{ maxHeight: 200 }}>
+      <video
+        css={{ height: '100%' }}
+        controls
+        autoPlay
+        src={`/mp4/${escape(file.fullPath)}`}
+        onEnded={() => {
+          setVideoIndex(videoIndex + 1);
+        }}
+      />
+    </div>
+  );
+};

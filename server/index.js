@@ -94,18 +94,23 @@ app.get(['/browse', '/browse/*', '/list'], async (request, response) => {
   response.send({ files: await Promise.all(result) });
 });
 
-app.get('/thumb/*', (request, response) => {
+app.get('/thumb/*', async (request, response) => {
   const { 0: path, width = '200' } = request.params;
   const fullPath = resolve(FILES_PATH, path);
   const mimeType = mime.getType(fullPath);
 
-  if (mimeType?.startsWith('video/')) {
-    simpleThumbnail(fullPath, response, `${width}x?`, {
-      seek: '00:00:01',
-    });
-  }
-  if (mimeType?.startsWith('image/')) {
-    simpleThumbnail(fullPath, response, `${width}x?`);
+  try {
+    if (mimeType?.startsWith('video/')) {
+      await simpleThumbnail(fullPath, response, `${width}x?`, {
+        seek: '00:00:01',
+      });
+    }
+    if (mimeType?.startsWith('image/')) {
+      await simpleThumbnail(fullPath, response, `${width}x?`);
+    }
+  } catch (error) {
+    // if (!response.headersSent) response.status(500);
+    // response.send({ error: error.message ?? error });
   }
 });
 
